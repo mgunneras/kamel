@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Kamel: Swedish to English subtitles",
+  "version": "1.1",
+  "description": "Translates TV4 Play subtitles to English on-device with Chrome's built-in translator. Press T to toggle.",
+  "minimum_chrome_version": "138",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Kamel subtitle settings",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.tv4play.se/*"],
+      "js": ["bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.tv4play.se/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ]
+}

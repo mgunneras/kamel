@@ -1,0 +1,58 @@
+/* Hide the player's own Swedish lines while translation is on. */
+html.kamel-on:not(.kamel-dual) #html-subtitles > :not(.kamel-box) {
+  display: none !important;
+}
+
+html.kamel-dual .kamel-box {
+  margin-top: 4px;
+}
+
+.kamel-box {
+  display: none;
+  box-sizing: border-box;
+  max-width: 80vw;
+  color: #fff;
+  font-family: inherit;
+  line-height: 1.3;
+  text-align: center;
+  white-space: pre-line;
+  text-wrap: balance;
+  pointer-events: none;
+}
+
+/* Background hugs each line of text instead of filling the whole box. */
+.kamel-box > span {
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, var(--kamel-bg, 0.7));
+  /* Keeps the text readable when the background is turned down to 0. */
+  text-shadow: 0 0 4px #000, 0 1px 2px #000;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+html.kamel-on .kamel-box.kamel-has-text {
+  display: block;
+}
+
+/* Used only when the player has no #html-subtitles container to sit in. */
+.kamel-box.kamel-floating {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  z-index: 2147483000;
+}
+
+.kamel-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  font: 14px/1.3 system-ui, sans-serif;
+  pointer-events: none;
+}

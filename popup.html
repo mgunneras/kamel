@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kamel settings</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fbfaf8;
+    --text: #1d1b19;
+    --muted: #6d6862;
+    --line: #e4e0da;
+    --accent: #d6331f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1b1a;
+      --text: #f1eee9;
+      --muted: #a39d95;
+      --line: #35322f;
+      --accent: #ff5a45;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    width: 280px;
+    margin: 0;
+    padding: 14px 16px 12px;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.4 system-ui, sans-serif;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  label.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .hint { display: block; color: var(--muted); font-size: 11px; }
+  input { accent-color: var(--accent); }
+
+  /* Switch */
+  input[type="checkbox"] {
+    appearance: none;
+    flex: none;
+    width: 34px;
+    height: 20px;
+    margin: 0;
+    border-radius: 10px;
+    background: var(--line);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  input[type="checkbox"]::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+  }
+  input[type="checkbox"]:checked { background: var(--accent); }
+  input[type="checkbox"]:checked::after { transform: translateX(14px); }
+  input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .slider {
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+  }
+  .slider div {
+    display: flex;
+    justify-content: space-between;
+  }
+  .slider output { color: var(--muted); font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; margin: 6px 0 0; }
+
+  #status {
+    margin: 0;
+    padding-top: 9px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 11px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    input[type="checkbox"], input[type="checkbox"]::after { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <h1>Swedish → English subtitles</h1>
+
+  <label class="row">
+    <span>Translate subtitles<span class="hint">Shortcut: T on the player page</span></span>
+    <input type="checkbox" id="on">
+  </label>
+
+  <label class="row">
+    <span>Show Swedish too<span class="hint">Original above, English below</span></span>
+    <input type="checkbox" id="dual">
+  </label>
+
+  <div class="slider">
+    <div><label for="size">Text size</label><output id="sizeOut"></output></div>
+    <input type="range" id="size" min="60" max="160" step="5">
+  </div>
+
+  <div class="slider">
+    <div><label for="bg">Background</label><output id="bgOut"></output></div>
+    <input type="range" id="bg" min="0" max="100" step="5">
+  </div>
+
+  <p id="status"></p>
+  <script src="popup.js"></script>
+</body>
+</html>
