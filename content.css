@@ -49,13 +49,22 @@ html.kamel-on .kamel-box.kamel-has-text {
   top: 16px;
   left: 64px;
   z-index: 2147483647;
-  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px 10px 16px;
   border-radius: 999px;
   color: #fff;
-  background: rgba(0, 0, 0, 0.6);
-  font: 13px/1.3 system-ui, sans-serif;
+  background: rgba(0, 0, 0, 0.65);
+  font: 500 22px/1.2 system-ui, sans-serif;
   pointer-events: none;
   animation: kamel-in 0.2s ease-out;
+}
+
+/* The camel. */
+.kamel-toast > span:first-child {
+  font-size: 48px;
+  line-height: 1;
 }
 
 @keyframes kamel-in {

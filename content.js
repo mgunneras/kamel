@@ -101,7 +101,7 @@
   // video starts. It runs one real translation first, so "on" means it works.
   async function announce() {
     const run = ++announceRun;
-    toast('🐫 Checking translator…', 5000);
+    toast('Checking translator…', 5000);
     let message = '';
     try {
       const tr = await getTranslator();
@@ -114,7 +114,7 @@
       problem = 'Translator stopped responding, retrying';
     }
     if (run !== announceRun || !on) return;
-    toast('🐫 ' + (message || problem || 'Translator not ready yet'), 5000);
+    toast((message || problem || 'Translator not ready yet'), 5000);
   }
 
   async function translateCue(tr, text) {
@@ -197,8 +197,10 @@
   let toastTimer = 0;
   const toastEl = document.createElement('div');
   toastEl.className = 'kamel-toast';
+  toastEl.appendChild(document.createElement('span')).textContent = '🐫';
+  const toastText = toastEl.appendChild(document.createElement('span'));
   function toast(message, ms) {
-    toastEl.textContent = message;
+    toastText.textContent = message;
     // Inside the fullscreen element when there is one, or it would not be visible.
     const host = document.fullscreenElement || document.body;
     if (toastEl.parentElement !== host) host.appendChild(toastEl);
@@ -208,7 +210,7 @@
 
   function announceOff() {
     announceRun++;
-    toast('🐫 English subtitles off', 3000);
+    toast('English subtitles off', 3000);
   }
 
   function readSettings() {
