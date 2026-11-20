@@ -18,4 +18,7 @@ The first time, Chrome may need to download its Swedish language pack. Click the
 ## Use
 
 - Press `T` on the player page to switch between English and the original.
+- A 🐫 badge appears in the corner for a few seconds when translation is on and working.
 - Click the extension icon for settings: on/off, show Swedish too, text size, background.
+
+<img src="settings.png" alt="The settings pane: translate on/off, show Swedish too, text size and background sliders" width="281">

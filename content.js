@@ -17,6 +17,9 @@
   let sizeScale = 1;
 
   let translator = null;
+  let creating = null;
+  let announceRun = 0;
+  let announcedVideo = null;
   let nextCreateAttempt = 0;
   let problem = '';
   let busy = false;
@@ -73,20 +76,45 @@
   async function getTranslator() {
     if (translator) return translator;
     if (!('Translator' in self)) {
-      problem = 'This Chrome has no built-in translator (needs Chrome 138 or newer on desktop).';
+      problem = 'This Chrome has no built-in translator (needs Chrome 138 or newer)';
       return null;
     }
+    if (creating) return creating;
     if (Date.now() < nextCreateAttempt) return null;
     nextCreateAttempt = Date.now() + 3000;
+    creating = Translator.create({ sourceLanguage: 'sv', targetLanguage: 'en' }).then(
+      (t) => {
+        problem = '';
+        return (translator = t);
+      },
+      () => {
+        // Usually: the language pack still needs downloading, which Chrome only
+        // starts after a click or key press on the page. We retry on the next tick.
+        problem = 'Translator not ready: click the page once so Chrome can download Swedish';
+        return null;
+      },
+    ).finally(() => { creating = null; });
+    return creating;
+  }
+
+  // Corner badge shown for a few seconds when translation is switched on or a
+  // video starts. It runs one real translation first, so "on" means it works.
+  async function announce() {
+    const run = ++announceRun;
+    toast('🐫 Checking translator…', 5000);
+    let message = '';
     try {
-      translator = await Translator.create({ sourceLanguage: 'sv', targetLanguage: 'en' });
-      problem = '';
-    } catch (err) {
-      // Usually: the language pack still needs downloading, which Chrome only
-      // starts after a click or key press on the page. We retry on the next tick.
-      problem = 'Translator not ready yet: click the page once to let Chrome download Swedish. (' + err.message + ')';
+      const tr = await getTranslator();
+      if (tr) {
+        await tr.translate('Hej');
+        message = 'English subtitles on';
+      }
+    } catch {
+      translator = null;
+      problem = 'Translator stopped responding, retrying';
     }
-    return translator;
+    if (run !== announceRun || !on) return;
+    toast('🐫 ' + (message || problem || 'Translator not ready yet'), 5000);
   }
 
   async function translateCue(tr, text) {
@@ -140,6 +168,10 @@
     const hs = subsContainer();
     const parent = hs || (video && video.parentElement);
     if (!parent) return;
+    if (video && video !== announcedVideo) {
+      announcedVideo = video;
+      if (on) announce();
+    }
     if (box.parentElement !== parent) parent.appendChild(box);
     box.classList.toggle('kamel-floating', !hs);
     const size = Math.max(14, Math.round(video ? video.clientHeight * 0.045 * sizeScale : 24)) + 'px';
@@ -163,22 +195,28 @@
   });
 
   let toastTimer = 0;
-  function toast(message) {
-    let el = document.querySelector('.kamel-toast');
-    if (!el) {
-      el = document.createElement('div');
-      el.className = 'kamel-toast';
-    }
-    el.textContent = message;
-    (document.fullscreenElement || document.body).appendChild(el);
+  const toastEl = document.createElement('div');
+  toastEl.className = 'kamel-toast';
+  function toast(message, ms) {
+    toastEl.textContent = message;
+    // Inside the fullscreen element when there is one, or it would not be visible.
+    const host = document.fullscreenElement || document.body;
+    if (toastEl.parentElement !== host) host.appendChild(toastEl);
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.remove(), 2500);
+    toastTimer = setTimeout(() => toastEl.remove(), ms);
+  }
+
+  function announceOff() {
+    announceRun++;
+    toast('🐫 English subtitles off', 3000);
   }
 
   function readSettings() {
     let s = {};
     try { s = JSON.parse(root.dataset.kamel || '{}'); } catch {}
+    const was = on;
     on = s.on !== false;
+    if (on !== was && announcedVideo) on ? announce() : announceOff();
     sizeScale = (Number.isFinite(s.size) ? s.size : 100) / 100;
     root.classList.toggle('kamel-on', on);
     root.classList.toggle('kamel-dual', !!s.dual);
@@ -201,7 +239,7 @@
     const el = e.target;
     if (el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
     setOn(!on);
-    toast(on ? (problem || 'English subtitles on') : 'English subtitles off (original shown)');
+    on ? announce() : announceOff();
   }, true);
 
   document.addEventListener('kamel-settings', readSettings);
